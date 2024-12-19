@@ -38,3 +38,26 @@ module.exports.registerUser =  async function(res,req){
     }
 
     };
+
+
+module.exports.loginUser = async function(req,res){
+    let{email,password}=req.body;
+    let user =  await userModel.findOne({email:email});
+    if(!user) return res.send("invalid Email and paassword");
+
+    bcrypt.compare(password,user.password,function(err,result){
+        if(result){
+            let token = generateToken(user);
+            res.cookie("token",token);
+            res.send("you can login");
+        }
+        else{
+            return res.send("invalid Email and paassword");
+        }
+    })
+};
+
+module.exports.logout =async function(req,res){
+    res.cookie("token","");
+    res.redirect("/");
+};
